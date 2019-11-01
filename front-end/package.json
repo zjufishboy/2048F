@@ -1,8 +1,8 @@
 {
-  "name": "blk2048",
+  "name": "2048F",
   "version": "0.2.0",
   "private": true,
-  "homepage": ".",
+  "homepage": "https://zjufishboy.github.io/2048F",
   "dependencies": {
     "antd": "^3.24.3",
     "babel-plugin-import": "^1.12.2",
