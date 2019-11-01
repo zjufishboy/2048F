@@ -1,6 +1,8 @@
 import React from 'react';
 import '../../css/common.css';
 import './Home.css';
+import { common } from '../../utils/config';
+import { Button, message } from 'antd';
 
 class Home extends React.Component {
     constructor(props){
@@ -12,20 +14,20 @@ class Home extends React.Component {
                 [0,0,0,0],
                 [0,0,0,0]
             ],
-            max:2
+            max:1
         }
     }
     randomPutNum=(f)=>{
         let data=[]
         data=this.getSpace()
         if(data.length===0){
-            alert("finished!:"+this.state.max)
+            message.info("游戏结束!:"+Math.pow(2,this.state.max))
             return 
         }
         let k = data[(new Date().getTime())%data.length]
         let i=parseInt(k/4)
         let j=k%4
-        if(f)console.log(i,j)
+        //if(f)console.log(i,j)
         let num = this.state.max>16?4:2
         if(this.state.map[i][j]===0)
             this.setItem(i,j,num)
@@ -43,8 +45,31 @@ class Home extends React.Component {
         }
         return data
     }
+    restart=()=>{
+        this.setState({map:[
+            [0,0,0,0],
+            [0,0,0,0],
+            [0,0,0,0],
+            [0,0,0,0]
+        ],max:1})
+        setTimeout(()=>{this.randomPutNum(true)},50)
+        setTimeout(()=>{this.saveState()},100)
+    }
+    saveState=()=>{
+        localStorage.setItem("2048data",JSON.stringify(this.state.map))
+        localStorage.setItem("2048dataMax",this.state.max.toString())
+    }
+    getState=()=>{
+        this.setState({map:JSON.parse(localStorage.getItem("2048data"))})
+        this.setState({max:parseInt(localStorage.getItem("2048dataMax"))})
+    }
     componentDidMount(){
-        this.randomPutNum(true)
+        if(!localStorage.getItem("2048dataMax")){
+            this.randomPutNum(true)
+        }
+        else{
+            this.getState()
+        }
         window.addEventListener("keydown",e=>{
             switch(e.key){
                 case "ArrowDown":
@@ -64,6 +89,7 @@ class Home extends React.Component {
                     break
             }
             this.randomPutNum(true)
+            setTimeout(()=>{this.saveState()},50)
         })
     }
     handleMapRight=()=>{
@@ -76,7 +102,7 @@ class Home extends React.Component {
                 let f=3-k
                 if(Data[f]!==0){
                     if(check!==-1&&Data[f]===Data[check]){
-                        Data[check]*=2
+                        Data[check]+=1
                         if(Data[check]>max){
                             max=Data[check]
                         }
@@ -107,7 +133,7 @@ class Home extends React.Component {
                 let f=k
                 if(Data[f]!==0){
                     if(check!==-1&&Data[f]===Data[check]){
-                        Data[check]*=2
+                        Data[check]+=1
                         if(Data[check]>max){
                             max=Data[check]
                         }
@@ -139,7 +165,7 @@ class Home extends React.Component {
                 
                 if(Data[f]!==0){
                     if(check!==-1&&Data[f]===Data[check]){
-                        Data[check]*=2
+                        Data[check]+=1
                         if(Data[check]>max){
                             max=Data[check]
                         }
@@ -171,7 +197,7 @@ class Home extends React.Component {
                 
                 if(Data[f]!==0){
                     if(check!==-1&&Data[f]===Data[check]){
-                        Data[check]*=2
+                        Data[check]+=1;
                         if(Data[check]>max){
                             max=Data[check]
                         }
@@ -192,9 +218,9 @@ class Home extends React.Component {
         }
         this.setState({map:map,max:max})
     }
-    itemToDiv=(item)=>(
-        <div className="ccFlexColumn" style={{width:56,height:56,background:"pink",borderRadius:12}}>
-            {item===0?null:item}
+    itemToDiv=(item,key)=>(
+        <div className="ccFlexColumn" style={{width:56,height:56,background:common.divInfo[item].bgColor,color:common.divInfo[item].color,borderRadius:12,fontSize:30,fontWeight:"bold"}}>
+            {item===0?null:Math.pow(2,item-1)}
         </div>
     )
     setItem(i,j,k){
@@ -202,19 +228,24 @@ class Home extends React.Component {
         map[i][j]=k
         this.setState({map:map})
     }
-    lineToDiv=(item)=>(
-        <div className="bcFlexRow" style={{width:240,height:56}}>
+    lineToDiv=(item,key)=>(
+        <div className="bcFlexRow" style={{width:240,height:56}} key={"line_"+key}>
             {item.map(this.itemToDiv)}
         </div>
     )
     render(){
         return (
             <div className="OutSide ccFlexColumn" style={{background:"#efefef"}}>
-                <div className="bcFlexColumn" style={{width:240,height:240,background:"#ffffff",borderTopLeftRadius:20,borderTopRightRadius:20,padding:16/3}}>
+                <div className="bcFlexColumn" style={{width:240,height:240,background:"#bbada0",borderTopLeftRadius:20,borderTopRightRadius:20,padding:16/3}}>
                     {this.state.map.map(this.lineToDiv)}
                 </div>
-                <div className="ccFlexColumn" style={{width:240,height:40,background:"#ffffff",borderBottomLeftRadius:20,borderBottomRightRadius:20,padding:16/3}}>
-                    最大值：{this.state.max}
+                <div className="ccFlexRow" style={{width:240,height:40,background:"#ffffff",borderBottomLeftRadius:20,borderBottomRightRadius:20,padding:16/3}}>
+                    <div className="ccFlexRow" style={{width:120}}>
+                        最大值：{Math.pow(2,this.state.max)}
+                    </div>
+                    <div className="ccFlexRow" style={{width:40}}>
+                        <Button type="link" onClick={()=>{this.restart()}}>重置</Button>
+                    </div>
                 </div>
             </div>
           );

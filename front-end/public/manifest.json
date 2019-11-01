@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "BLK2048",
+  "name": "游鱼星的2048",
   "icons": [
     {
       "src": "favicon.ico",
@@ -19,7 +19,9 @@
     }	    
   ],
   "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "orientation":"portrait-primary",
+  "display":"fullscreen",
+  "theme_color": "#2e8a73",
+  "background_color": "#2e538a",
+  "description":"一款2048小游戏"
 }
