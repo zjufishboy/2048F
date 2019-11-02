@@ -3,7 +3,8 @@ import '../../css/common.css';
 import './Home.css';
 import { common } from '../../utils/config';
 import { Button, message } from 'antd';
-
+let startX,startY,moveEndX,moveEndY;
+let TouchState;
 class Home extends React.Component {
     constructor(props){
         super()
@@ -14,14 +15,14 @@ class Home extends React.Component {
                 [0,0,0,0],
                 [0,0,0,0]
             ],
-            max:1
+            max:2
         }
     }
     randomPutNum=(f)=>{
         let data=[]
         data=this.getSpace()
         if(data.length===0){
-            message.info("游戏结束!:"+Math.pow(2,this.state.max))
+            message.info("游戏结束!:"+Math.pow(2,this.state.max+1))
             return 
         }
         let k = data[(new Date().getTime())%data.length]
@@ -51,7 +52,7 @@ class Home extends React.Component {
             [0,0,0,0],
             [0,0,0,0],
             [0,0,0,0]
-        ],max:1})
+        ],max:2})
         setTimeout(()=>{this.randomPutNum(true)},50)
         setTimeout(()=>{this.saveState()},100)
     }
@@ -229,19 +230,58 @@ class Home extends React.Component {
         this.setState({map:map})
     }
     lineToDiv=(item,key)=>(
-        <div className="bcFlexRow" style={{width:240,height:56}} key={"line_"+key}>
+        <div className="bcFlexRow" style={{width:240,height:56,padding:"0px 5.3333px"}} key={"line_"+key}>
             {item.map(this.itemToDiv)}
         </div>
     )
+    touchstart=()=>{
+        let e = window.event;
+        // e.preventDefault();
+        startX = e.targetTouches[0].pageX;
+        startY = e.targetTouches[0].pageY;
+        TouchState=0;
+    }
+    touchmove=(item)=>{
+        let e = window.event;
+        // e.preventDefault(); // 阻止浏览器默认事件
+        moveEndX = e.targetTouches[0].pageX;
+        moveEndY = e.targetTouches[0].pageY;
+        let X = moveEndX - startX;
+        let Y = moveEndY - startY;
+        
+        if (Math.abs(X) > 60&&X>0){  
+            if(TouchState===0)TouchState=1;
+            this.handleMapRight()
+        } 
+        else if (Math.abs(X) > 60&&X<0){
+            if(TouchState===0)TouchState=1;
+            this.handleMapLeft()
+        }
+        else if (Math.abs(Y) > 60&&Y>0){  
+            if(TouchState===0)TouchState=1;
+            this.handleMapDown()
+        } 
+        else if (Math.abs(Y) > 60&&Y<0){
+            if(TouchState===0)TouchState=1;
+            this.handleMapUp()
+        }
+        
+    }
+    touchEnd=()=>{
+        if(TouchState===1){
+            this.randomPutNum(true) 
+            //TouchState=2;
+        }
+    }
     render(){
         return (
-            <div className="OutSide ccFlexColumn" style={{background:"#efefef"}}>
+            <div className="OutSide ccFlexColumn" style={{background:"#efefef"}} onTouchStart={this.touchstart} onTouchMove={this.touchmove} onTouchEnd={this.touchEnd}>
                 <div className="bcFlexColumn" style={{width:240,height:240,background:"#bbada0",borderTopLeftRadius:20,borderTopRightRadius:20,padding:16/3}}>
                     {this.state.map.map(this.lineToDiv)}
                 </div>
                 <div className="ccFlexRow" style={{width:240,height:40,background:"#ffffff",borderBottomLeftRadius:20,borderBottomRightRadius:20,padding:16/3}}>
                     <div className="ccFlexRow" style={{width:120}}>
-                        最大值：{Math.pow(2,this.state.max)}
+                        最大值：{Math.pow(2,this.state.max-1)}
                     </div>
                     <div className="ccFlexRow" style={{width:40}}>
                         <Button type="link" onClick={()=>{this.restart()}}>重置</Button>
