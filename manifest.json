@@ -20,7 +20,7 @@
   ],
   "start_url": ".",
   "orientation":"portrait-primary",
-  "display":"fullscreen",
+  "display":"standalone",
   "theme_color": "#2e8a73",
   "background_color": "#2e538a",
   "description":"一款2048小游戏"
